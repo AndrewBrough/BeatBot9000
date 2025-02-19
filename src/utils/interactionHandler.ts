@@ -1,7 +1,7 @@
 import fs from "fs"
 import path from "path"
 import type { Interaction } from "discord.js"
-import type { Manager } from "erela.js"
+import type { LavalinkManager } from "lavalink-client"
 
 const commands = new Map()
 const commandFiles = fs.readdirSync(path.join(__dirname, "../commands"))
@@ -12,7 +12,7 @@ for (const file of commandFiles) {
   commands.set(command.data.name, command)
 }
 
-export const handleInteraction = async (interaction: Interaction, manager: Manager) => {
+export const handleInteraction = async (interaction: Interaction, lavalink: LavalinkManager) => {
   if (!interaction.isCommand()) return
 
   const command = commands.get(interaction.commandName)
@@ -23,7 +23,7 @@ export const handleInteraction = async (interaction: Interaction, manager: Manag
   }
 
   try {
-    await command.execute(interaction, manager)
+    await command.execute(interaction, lavalink)
   } catch (error) {
     console.error(error)
     // Only reply if we haven't replied yet
