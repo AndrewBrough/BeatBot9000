@@ -34,73 +34,29 @@ const requiredEnvVars = [
   },
 ]
 
-export const setupConfig = async (): Promise<void> => {
-  const envPath = join(process.cwd(), ".env")
+export interface Config {
+  token: string
+  clientId: string
+  lavalinkPassword: string
+}
 
-  try {
-    // Check if .env exists
-    await access(envPath)
-    // If it exists, load it and check if all required vars are present
-    config()
-
-    const missingVars = requiredEnvVars.filter(({ key }) => !process.env[key])
-
-    if (missingVars.length === 0) {
-      return // All required vars exist
-    }
-
-    console.log("Some required configuration is missing. Starting setup...")
-
-    // Read existing .env content
-    const existingEnv = await readFile(envPath, "utf-8")
-    const envVars = new Map(
-      existingEnv
-        .split("\n")
-        .filter((line) => line.includes("="))
-        .map((line) => line.split("=") as [string, string]),
-    )
-
-    // Only prompt for missing variables
-    for (const { key, prompt, info, default: defaultValue } of missingVars) {
-      console.log(`\n${info || ""}`)
-      const value = await question(prompt)
-      envVars.set(key, value || defaultValue || "")
-    }
-
-    // Write back all variables
-    const envContent = Array.from(envVars.entries())
-      .map(([key, value]) => `${key}=${value}`)
-      .join("\n")
-
-    await writeFile(envPath, envContent)
-  } catch (error) {
-    // .env doesn't exist, create it from scratch
-    console.log("Welcome to BeatBot! Let's set up your configuration.")
-
-    const envVars = new Map()
-
-    for (const { key, prompt, info, default: defaultValue } of requiredEnvVars) {
-      console.log(`\n${info || ""}`)
-      const value = await question(prompt)
-      envVars.set(key, value || defaultValue || "")
-    }
-
-    // Add default Lavalink host and port
-    envVars.set("LAVALINK_HOST", "localhost")
-    envVars.set("LAVALINK_PORT", "2333")
-
-    const envContent = Array.from(envVars.entries())
-      .map(([key, value]) => `${key}=${value}`)
-      .join("\n")
-
-    await writeFile(envPath, envContent)
-  }
-
-  rl.close()
-
-  // Reload environment variables
+export const setupConfig = async (): Promise<Config> => {
+  // Load environment variables
   config()
 
-  console.log("\nConfiguration saved successfully! Starting bot...\n")
+  // Check for required environment variables
+  const token = process.env.DISCORD_TOKEN
+  const clientId = process.env.CLIENT_ID
+  const lavalinkPassword = process.env.LAVALINK_PASSWORD || 'youshallnotpass'
+
+  if (!token || !clientId) {
+    throw new Error('Missing required environment variables: DISCORD_TOKEN and CLIENT_ID must be set. Please add them in .env in the project (before deploying the docker container).')
+  }
+
+  return {
+    token,
+    clientId,
+    lavalinkPassword
+  }
 }
 

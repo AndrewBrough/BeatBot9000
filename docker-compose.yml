@@ -1,14 +1,37 @@
 version: '3.8'
 services:
-  beatbot:
-    build: .
+  lavalink:
+    image: fredboat/lavalink:f76cf9b-alpine
+    networks:
+      - bot_network
     volumes:
-      - bot-data:/app/data
+      - ./application.yml:/opt/Lavalink/application.yml
     ports:
       - "2333:2333"
-    stdin_open: true  # Keep STDIN open
-    tty: true        # Allocate a pseudo-TTY
+
+  beatbot:
+    build: .
+    environment:
+      - DISCORD_TOKEN=${DISCORD_TOKEN}
+      - CLIENT_ID=${CLIENT_ID}
+      - LAVALINK_PASSWORD=youshallnotpass
+      - LAVALINK_HOST=lavalink
+      - LAVALINK_PORT=2333
+      - NODE_ENV=production
+    depends_on:
+      - lavalink
+    volumes:
+      - ./data:/app/data
+      - ./application.yml:/app/application.yml
+    networks:
+      - bot_network
+    ports:
+      - "3000:3000"
 
 volumes:
   bot-data:
+
+networks:
+  bot_network:
+    driver: bridge
 

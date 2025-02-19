@@ -9,9 +9,14 @@ export const data = new SlashCommandBuilder()
     option.setName("level").setDescription("Volume level (0-100)").setRequired(true).setMinValue(0).setMaxValue(100),
   )
 
-export const execute = async (interaction: CommandInteraction, manager: Manager) => {
-  const volume = interaction.options.getInteger("level")
-  if (volume === null) return interaction.reply("Please provide a valid volume level.")
+export async function volume(interaction: CommandInteraction, manager: Manager) {
+  if (!interaction.isCommand()) return;
+
+  const volume = interaction.options.get('level')?.value as number;
+  if (volume === undefined) {
+    await interaction.reply('Please provide a volume level');
+    return;
+  }
 
   const player = manager.get(interaction.guildId!)
 

@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from "@discordjs/builders"
-import { type CommandInteraction, MessageEmbed, Message, type MessageReaction, type User } from "discord.js"
+import { type CommandInteraction, EmbedBuilder, Message, type MessageReaction, type User } from "discord.js"
 import type { Manager } from "erela.js"
 import { searchTracks } from "../streaming/searchTracks"
 import { playTrack } from "../streaming/playTrack"
@@ -12,8 +12,13 @@ export const data = new SlashCommandBuilder()
   )
 
 export const execute = async (interaction: CommandInteraction, manager: Manager) => {
-  const query = interaction.options.getString("query")
-  if (!query) return interaction.reply("Please provide a search query.")
+  if (!interaction.isCommand()) return;
+
+  const query = interaction.options.get('query')?.value as string;
+  if (!query) {
+    await interaction.reply('Please provide a search query');
+    return;
+  }
 
   const results = await searchTracks(manager, query)
 
@@ -21,7 +26,7 @@ export const execute = async (interaction: CommandInteraction, manager: Manager)
     return interaction.reply("No results found.")
   }
 
-  const embed = new MessageEmbed()
+  const embed = new EmbedBuilder()
     .setTitle("Search Results")
     .setDescription(results.map((track, index) => `${index + 1}. ${track.title}`).join("\n"))
     .setFooter({ text: "React with 1-5 to select a song" })
