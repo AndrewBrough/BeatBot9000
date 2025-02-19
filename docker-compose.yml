@@ -1,0 +1,14 @@
+version: '3.8'
+services:
+  beatbot:
+    build: .
+    volumes:
+      - bot-data:/app/data
+    ports:
+      - "2333:2333"
+    stdin_open: true  # Keep STDIN open
+    tty: true        # Allocate a pseudo-TTY
+
+volumes:
+  bot-data:
+
