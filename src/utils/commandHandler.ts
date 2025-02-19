@@ -13,12 +13,11 @@ console.log('Using file extension:', fileExtension)
 const commandFiles = fs.readdirSync(path.join(__dirname, "../commands"))
   .filter((file) => file.endsWith(fileExtension))
 
-console.log('Directory contents:', fs.readdirSync(path.join(__dirname, "../commands")))
+console.log('Loading commands:', commandFiles.map(f => f.replace(fileExtension, '')))
 
 for (const file of commandFiles) {
   try {
     const command = require(`../commands/${file}`)
-    console.log(`Loading command from ${file}:`, command)
     commands.push(command.data.toJSON())
   } catch (error) {
     console.error(`Error loading command ${file}:`, error)
@@ -30,9 +29,6 @@ export const registerCommands = async (client: Client) => {
     console.error('Client user is not initialized')
     return
   }
-  
-  console.log('Found command files:', commandFiles)
-  console.log('Loaded commands:', commands)
   
   const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN!)
 

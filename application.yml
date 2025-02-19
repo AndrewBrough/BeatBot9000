@@ -16,9 +16,6 @@ lavalink:
       twitch: true
       vimeo: true
       http: true
-    version: 4
-    ws:
-      path: "/v4/websocket"
     bufferDurationMs: 400
     youtubePlaylistLoadLimit: 6
     playerUpdateInterval: 5
