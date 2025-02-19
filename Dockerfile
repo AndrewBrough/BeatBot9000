@@ -1,21 +1,22 @@
 # Stage 1: Build the TypeScript application
-FROM node:16-alpine AS builder
+FROM node:18-alpine AS builder
 WORKDIR /app
 
-# Clone the repository (replace with the correct URL when available)
-RUN apk add --no-cache git && \
-    git clone https://github.com/AndrewBrough/BeatBot9000 .
+# Copy package files first
+COPY package*.json ./
+COPY tsconfig.json ./
+COPY src ./src
 
 # Install dependencies and build
-RUN npm ci && \
+RUN npm i && \
     npm run build
 
 # Stage 2: Production environment
 FROM openjdk:11-jre-slim
 
-# Install Node.js
+# Install Node.js 18
 RUN apt-get update && apt-get install -y curl && \
-    curl -sL https://deb.nodesource.com/setup_16.x | bash - && \
+    curl -sL https://deb.nodesource.com/setup_18.x | bash - && \
     apt-get install -y nodejs && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
@@ -50,9 +51,6 @@ EXPOSE 2333 3000
 # Environment variables for Lavalink
 ENV LAVALINK_HOST=localhost \
     LAVALINK_PORT=2333
-
-# Working directory for the application
-WORKDIR /app
 
 CMD ["./start.sh"]
 

@@ -34,6 +34,11 @@ const initializeBot = async () => {
     console.log(`Logged in as ${client.user?.tag}!`)
     manager.init(client.user!.id)
     registerCommands(client)
+
+    // Generate and log OAuth2 URL
+    const inviteUrl = `https://discord.com/api/oauth2/authorize?client_id=${client.user!.id}&permissions=3214336&scope=bot%20applications.commands`
+    console.log("\nAdd bot to your server:")
+    console.log("\x1b[34m%s\x1b[0m", inviteUrl) // Blue colored URL
   })
 
   client.on("raw", (d) => manager.updateVoiceState(d))
