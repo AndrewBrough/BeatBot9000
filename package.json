@@ -7,7 +7,7 @@
     "start": "node dist/index.js",
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "docker:dev": "docker-compose -f docker-compose.yml -f docker-compose.dev.yml up",
-    "docker:prod": "docker-compose up"
+    "docker:prod": "docker compose up -d"
   },
   "dependencies": {
     "discord.js": "latest",
